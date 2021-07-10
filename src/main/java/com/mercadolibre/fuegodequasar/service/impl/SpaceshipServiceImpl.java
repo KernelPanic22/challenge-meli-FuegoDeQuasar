@@ -4,6 +4,7 @@ import com.mercadolibre.fuegodequasar.dto.SatelliteDTO;
 import com.mercadolibre.fuegodequasar.dto.SatelliteSplitDTO;
 import com.mercadolibre.fuegodequasar.dto.SpaceshipDTO;
 import com.mercadolibre.fuegodequasar.entities.SatelliteEntity;
+import com.mercadolibre.fuegodequasar.exception.SatelliteException;
 import com.mercadolibre.fuegodequasar.model.Position;
 import com.mercadolibre.fuegodequasar.model.SatelliteModel;
 import com.mercadolibre.fuegodequasar.model.SatelliteSplitModel;
@@ -19,7 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class SpaceshipServiceImpl implements SpaceshipService {
@@ -42,16 +45,27 @@ public class SpaceshipServiceImpl implements SpaceshipService {
     @Autowired
     private RedisTemplate<String, SatelliteSplitDTO> redisTemplate;
 
+    /**
+     * @param satelliteSplitDTO El satelite recibido desde la API
+     * @param name Nombre del satelite
+     * @return Retorna un ResponseEntity comunicando si se pudo agregar el satellite a Redis.
+     */
     public HttpEntity<String> setSatelliteSplit(SatelliteSplitDTO satelliteSplitDTO, String name){
+        try{
         this.redisTemplate.opsForValue().set("satellite:"+ name,satelliteSplitDTO);
-        return ResponseEntity.ok("Parametro agregado correctamente");
+        }catch (Exception e){
+            ResponseEntity.internalServerError().body(e);
+        }
+        return ResponseEntity.ok("Parámetro agregado correctamente");
     }
 
+    /**
+     * @return Retorna una la Spaceship utilizando los satellites guardados en Redis.
+     */
     public ResponseEntity<SpaceshipDTO> getSpaceshipSplit(){
         SatelliteDTO satelliteDTO = new SatelliteDTO();
         List<SatelliteModel> satellites = new ArrayList<>();
         Set<String> redisKeys = this.redisTemplate.keys("satellite:*");
-        // Store the keys in a List
         List<String> keysList = new ArrayList<>();
         for (String currentKey:
                 redisKeys) {
@@ -68,19 +82,19 @@ public class SpaceshipServiceImpl implements SpaceshipService {
         return this.getSpaceship(satelliteDTO);
     }
 
-
-
-
+    /**
+     * @param satelliteDTO Los satelites recibido desde la API
+     * @return Retorna una la Spaceship utilizando los satellites recibidos desde la API.
+     */
     public ResponseEntity<SpaceshipDTO> getSpaceship(SatelliteDTO satelliteDTO){
         try{
-        if(satelliteDTO.getSatellites().size() < spaceshipMinimumSatellites){
-                throw new Exception("Spaceship Minimum Satellites is "+spaceshipMinimumSatellites);
-            }
-        satelliteDTO.setPositions(getSatellites(satelliteDTO));
-        Position position = trilaterationService.getSpaceshipLocation(satelliteDTO.getPositions(),satelliteDTO.getDistances());
-        String message = messageService.decodeMessages(satelliteDTO.getMessages());
-
-        return new ResponseEntity<>(SpaceshipDTO.builder().position(position).message(message).build(), HttpStatus.OK);
+            if(satelliteDTO.getSatellites().size() < spaceshipMinimumSatellites){
+                throw new SatelliteException("Spaceship Minimum Satellites is "+spaceshipMinimumSatellites);
+                }
+            satelliteDTO.setPositions(getSatellites(satelliteDTO));
+            Position position = trilaterationService.getSpaceshipLocation(satelliteDTO.getPositions(),satelliteDTO.getDistances());
+            String message = messageService.decodeMessages(satelliteDTO.getMessages());
+            return new ResponseEntity<>(SpaceshipDTO.builder().position(position).message(message).build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(SpaceshipDTO.builder().position(
                     Position.builder().build())
@@ -89,14 +103,18 @@ public class SpaceshipServiceImpl implements SpaceshipService {
                     ,HttpStatus.BAD_REQUEST);
         }
     }
-
-    private List<SatelliteEntity> getSatellites(SatelliteDTO satelliteDTO) throws Exception {
+    /**
+     * @param satelliteDTO Los satelites recibido desde la API
+     * @return Retorna una List de entidades de satellite desde la DB.
+     * @throws SatelliteException Si no se puede encontrar el satellite.
+     */
+    private List<SatelliteEntity> getSatellites(SatelliteDTO satelliteDTO) throws SatelliteException {
         List<SatelliteModel> satellites = satelliteDTO.getSatellites();
         List<SatelliteEntity> satellitesFromDb = new ArrayList<>();
         for(SatelliteModel satellite : satellites) {
             SatelliteEntity satelliteFromDb = satelliteRepository.findByName(satellite.getName().toUpperCase());
             if(satelliteFromDb == null)
-                throw new Exception("No se encuentra uno o mas satelites en la base de datos");
+                throw new SatelliteException("No se encuentra uno o mas satelites en la base de datos");
         satellitesFromDb.add(satelliteFromDb);
         }
         return satellitesFromDb;
