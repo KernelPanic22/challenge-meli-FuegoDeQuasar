@@ -1,7 +1,7 @@
 
 # Challenge Backend MercadoLibre 
 
-Esta app desarrollada en Spring expone una REST API para devolver una spaceship con el mensaje desencriptado que se le es enviado y su posición.
+Esta app desarrollada en Spring expone una REST API que recibe satelites con un mensaje encriptado y su distancia, juntos o por separado, para devolver una nave con el mensaje desencriptado y la posición de la nave.
 
 ## 🔨Desarrollado con:
 * [Java 11](https://www.oracle.com/ar/java/technologies/javase-jdk11-downloads.html)
