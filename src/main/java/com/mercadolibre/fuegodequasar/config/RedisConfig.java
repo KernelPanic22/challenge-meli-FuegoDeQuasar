@@ -13,15 +13,20 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-	@Value("${prisma.api.oauth.redis.server}")
+	@Value("${redis.server}")
 	private String redisServer;
 
-	@Value("${prisma.api.oauth.redis.port}")
+	@Value("${redis.port}")
 	private Integer redisPort;
+
+	@Value("${redis.password}")
+	private String redisPassword;
 
 	@Bean
 	public JedisConnectionFactory jedisConnectionFactory() {
-		return new JedisConnectionFactory(new RedisStandaloneConfiguration(redisServer, redisPort));
+		RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(redisServer, redisPort);
+		configuration.setPassword(redisPassword);
+		return new JedisConnectionFactory(configuration);
 	}
 
 	@Bean
