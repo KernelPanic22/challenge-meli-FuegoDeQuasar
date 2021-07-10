@@ -11,9 +11,9 @@ Esta app desarrollada en Spring expone una REST API para devolver una spaceship 
 * [Redis](https://redis.io/)
 
 ## 👷Colección Insomnia
-Json para importar a [Insomnia](https://insomnia.rest/download) para el testeo de la API
-[localhost](https://github.com/KernelPanic22/challenge-meli-FuegoDeQuasar/blob/master/src/main/resources/Fuego-de-quasar)
-[prod](https://github.com/KernelPanic22/challenge-meli-FuegoDeQuasar/blob/master/src/main/resources/Fuego-de-quasar-prod)
+Json para importar a [Insomnia](https://insomnia.rest/download) para el testeo de la API:
+* [localhost](https://github.com/KernelPanic22/challenge-meli-FuegoDeQuasar/blob/master/src/main/resources/Fuego-de-quasar)
+* [prod](https://github.com/KernelPanic22/challenge-meli-FuegoDeQuasar/blob/master/src/main/resources/Fuego-de-quasar-prod)
 
 ## 🚀API Swagger
 * [prod](https://mercado-fuego-de-quasar.herokuapp.com/swagger-ui.html)
