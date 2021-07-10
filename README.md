@@ -16,8 +16,8 @@ Json para importar a [Insomnia](https://insomnia.rest/download) para el testeo d
 [prod](https://github.com/KernelPanic22/challenge-meli-FuegoDeQuasar/blob/master/src/main/resources/Fuego-de-quasar-prod)
 
 ## 🚀API Swagger
-[prod](https://mercado-fuego-de-quasar.herokuapp.com/swagger-ui.html)
-[local](http://localhost:8080/swagger-ui.html)
+* [prod](https://mercado-fuego-de-quasar.herokuapp.com/swagger-ui.html)
+* [local](http://localhost:8080/swagger-ui.html)
 
 
 
