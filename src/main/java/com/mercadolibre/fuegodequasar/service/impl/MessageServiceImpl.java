@@ -1,5 +1,7 @@
 package com.mercadolibre.fuegodequasar.service.impl;
 
+import com.mercadolibre.fuegodequasar.dto.SatelliteDTO;
+import com.mercadolibre.fuegodequasar.exception.MessageException;
 import com.mercadolibre.fuegodequasar.service.MessageService;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -10,13 +12,19 @@ import static com.mercadolibre.fuegodequasar.utils.MessageUtils.messagesSameLeng
 
 @Service
 public class MessageServiceImpl implements MessageService {
-    public String decodeMessages(List<List<String>> messages) throws Exception {
+    /**
+     * @param messages Una lista de listas de mensajes.
+     * @return Retorna el mensaje desencriptado.
+     * @throws MessageException Si no se puede desencriptar el mensaje
+     * @see SpaceshipServiceImpl#getSpaceship(SatelliteDTO)
+     */
+    public String decodeMessages(List<List<String>> messages) throws MessageException {
         if (!messagesSameLength(messages))
-            throw new Exception("Distinta cantidad de mensajes");
+            throw new MessageException("Mensajes de distinto largo.");
 
         Map<Integer,String> mismatchingWordsMap = differentWordsAtSamePosition(messages);
         if (!mismatchingWordsMap.isEmpty())
-            throw new Exception("Los mensajes contienen palabras distintas en la misma posicion" + mismatchingWordsMap.values());
+            throw new MessageException("Los mensajes contienen palabras distintas en la misma posicion" + mismatchingWordsMap.values());
 
         List<String> uniqueWords = messages.stream()//Todas las palabras unicas contenidas en los mensajes excepto las vacias
                 .flatMap(List::stream) //bajo todos los streams de mensajes a un unico stream
